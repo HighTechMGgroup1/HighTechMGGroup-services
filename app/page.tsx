@@ -44,7 +44,6 @@ const featuredProjects: Project[] = [
   },
 ];
 
-
 const categories = [
   {
     title: "Websites",
@@ -76,6 +75,60 @@ const categories = [
   },
 ];
 
+// Snowflake Component
+function Snowflake({
+  delay,
+  duration,
+  left,
+}: {
+  delay: number;
+  duration: number;
+  left: string;
+}) {
+  return (
+    <motion.div
+      className="absolute top-0 text-white/60"
+      style={{ left }}
+      initial={{ y: -20, opacity: 0 }}
+      animate={{
+        y: "100vh",
+        opacity: [0, 1, 1, 0],
+      }}
+      transition={{
+        duration,
+        delay,
+        repeat: Infinity,
+        ease: "linear",
+      }}
+    >
+      ❄
+    </motion.div>
+  );
+}
+
+// Snow Effect Component
+function SnowEffect() {
+  const snowflakes = Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    delay: Math.random() * 10,
+    duration: 10 + Math.random() * 10,
+    left: `${Math.random() * 100}%`,
+  }));
+
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
+      {snowflakes.map((flake) => (
+        <Snowflake
+          key={flake.id}
+          delay={flake.delay}
+          duration={flake.duration}
+          left={flake.left}
+        />
+      ))}
+    </div>
+  );
+}
+
 function PremiumButton({
   children,
   href,
@@ -106,10 +159,11 @@ function PremiumButton({
       ref={buttonRef}
       href={href}
       onMouseMove={handleMouseMove}
-      className={`group relative overflow-hidden px-8 py-4 rounded-xl font-semibold transition-all duration-500 ${isPrimary
-        ? "bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 text-gray-950 shadow-2xl shadow-amber-500/30 hover:shadow-amber-500/50"
-        : "border-2 border-amber-500/50 text-amber-400 hover:border-amber-400"
-        } ${className}`}
+      className={`group relative overflow-hidden px-8 py-4 rounded-xl font-semibold transition-all duration-500 ${
+        isPrimary
+          ? "bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 text-gray-950 shadow-2xl shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-105"
+          : "border-2 border-amber-500/50 text-amber-400 hover:border-amber-400 hover:bg-amber-500/10"
+      } ${className}`}
     >
       <span className="relative z-10 flex items-center gap-2">{children}</span>
       {isPrimary && (
@@ -142,13 +196,17 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       ref={ref}
       initial={{ opacity: 0, y: 50 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-      transition={{ duration: 0.7, delay: index * 0.15, ease: [0.25, 0.4, 0.25, 1] }}
+      transition={{
+        duration: 0.7,
+        delay: index * 0.15,
+        ease: [0.25, 0.4, 0.25, 1],
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="group relative"
     >
-      <div className="relative bg-gradient-to-b from-gray-900/50 to-gray-950/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-800/50 hover:border-amber-500/50 transition-all duration-700 transform hover:-translate-y-3 shadow-2xl shadow-black/50 hover:shadow-amber-500/20">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      <div className="relative bg-gradient-to-b from-gray-900/60 to-gray-950/60 backdrop-blur-xl rounded-3xl overflow-hidden border border-gray-800/50 hover:border-amber-500/50 transition-all duration-700 transform hover:-translate-y-3 shadow-2xl shadow-black/50 hover:shadow-amber-500/20">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.07] via-transparent to-yellow-500/[0.07] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
         <div className="relative w-full h-72 overflow-hidden">
           <motion.div
@@ -167,11 +225,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         </div>
 
         <div className="relative p-8">
-          <h3 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent mb-3">
+          <h3 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent mb-3 group-hover:from-amber-300 group-hover:to-yellow-400 transition-all duration-300">
             {project.title}
           </h3>
 
-          <p className="text-gray-400 leading-relaxed mb-6">
+          <p className="text-gray-400 leading-relaxed mb-6 group-hover:text-gray-300 transition-colors duration-300">
             {project.description}
           </p>
 
@@ -194,7 +252,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         </div>
 
         <motion.div
-          className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+          className="absolute -inset-[1px] rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
           style={{
             background:
               "linear-gradient(90deg, transparent, rgba(251,191,36,0.3), transparent)",
@@ -209,7 +267,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           }}
         />
       </div>
-    </motion.div >
+    </motion.div>
   );
 }
 
@@ -239,18 +297,22 @@ function CategoryCard({
       ref={ref}
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.25, 0.4, 0.25, 1] }}
+      transition={{
+        duration: 0.6,
+        delay: index * 0.1,
+        ease: [0.25, 0.4, 0.25, 1],
+      }}
     >
       <Link
         ref={cardRef}
         href={category.href}
         onMouseMove={handleMouseMove}
-        className="group relative block p-8 rounded-2xl bg-gradient-to-b from-gray-900/40 to-gray-950/40 backdrop-blur-sm border border-gray-800/50 hover:border-amber-500/50 transition-all duration-500 overflow-hidden"
+        className="group relative block p-8 rounded-2xl bg-gradient-to-b from-gray-900/50 to-gray-950/50 backdrop-blur-xl border border-gray-800/50 hover:border-amber-500/50 transition-all duration-500 overflow-hidden hover:-translate-y-1"
       >
         <motion.div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           style={{
-            background: `radial-gradient(circle 200px at ${mousePosition.x}px ${mousePosition.y}px, rgba(251,191,36,0.08), transparent)`,
+            background: `radial-gradient(circle 200px at ${mousePosition.x}px ${mousePosition.y}px, rgba(251,191,36,0.1), transparent)`,
           }}
         />
 
@@ -261,7 +323,7 @@ function CategoryCard({
           <h3 className="text-xl font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent mb-3 group-hover:from-yellow-300 group-hover:to-amber-400 transition-all duration-500">
             {category.title}
           </h3>
-          <p className="text-gray-400 text-sm leading-relaxed">
+          <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
             {category.description}
           </p>
         </div>
@@ -292,26 +354,56 @@ export default function HomePage() {
 
   return (
     <main className="relative bg-gray-950 text-white min-h-screen w-full overflow-x-hidden">
+      {/* Snow Effect */}
+      <SnowEffect />
+
+      {/* Background Gradients */}
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-gray-950 to-black pointer-events-none" />
 
+      {/* Mouse Follow Gradient */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-30"
+        className="fixed inset-0 pointer-events-none opacity-30 transition-opacity duration-300"
         style={{
-          backgroundImage: `radial-gradient(circle 600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(251,191,36,0.06), transparent)`,
+          backgroundImage: `radial-gradient(circle 600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(251,191,36,0.08), transparent)`,
         }}
       />
 
+      {/* Noise Texture */}
       <div className="fixed inset-0 opacity-[0.015] pointer-events-none mix-blend-overlay">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMSIvPjwvc3ZnPg==')]" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aWNoIiB0eXBlPSJmcmFjdGFsTm9pc2UiLz48ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIxIi8+PC9zdmc+')]" />
       </div>
 
+      {/* Hero Section */}
       <motion.section
         style={{ opacity, scale }}
         className="relative w-full min-h-screen flex flex-col items-center justify-center px-6 md:px-16 lg:px-24"
       >
+        {/* Animated Background Orbs */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: "1s" }} />
+          <motion.div
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-[120px]"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          <motion.div
+            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-[120px]"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.6, 0.3, 0.6],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
         </div>
 
         <div className="relative z-10 max-w-5xl text-center">
@@ -326,23 +418,23 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.2 }}
             >
-              <span className="block bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
+              <span className="block bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto] drop-shadow-[0_0_30px_rgba(251,191,36,0.3)]">
                 We Build High-Converting
               </span>
-              <span className="block bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
+              <span className="block bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto] drop-shadow-[0_0_30px_rgba(251,191,36,0.3)]">
                 Digital Experiences
               </span>
             </motion.h1>
           </motion.div>
 
           <motion.p
-            className="text-gray-400 text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed mb-12"
+            className="text-gray-300 text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.4 }}
           >
             Showcasing premium websites, creative branding, impactful posters,
-            and AI-powered video reels crafted with precision.
+            and AI-powered video reels crafted with precision and excellence.
           </motion.p>
 
           <motion.div
@@ -360,6 +452,7 @@ export default function HomePage() {
           </motion.div>
         </div>
 
+        {/* Scroll Indicator */}
         <motion.div
           className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
           animate={{ y: [0, 10, 0] }}
@@ -375,12 +468,13 @@ export default function HomePage() {
         </motion.div>
       </motion.section>
 
+      {/* Featured Projects Section */}
       <section
         id="featured"
         className="relative w-full py-24 md:py-32 px-6 md:px-16 lg:px-24 overflow-hidden"
       >
-        {/* Ambient Background */}
-        <div className="absolute inset-0 bg-black" />
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/20 to-transparent" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-amber-500/5 blur-[140px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-[500px] h-[400px] bg-yellow-400/5 blur-[120px] rounded-full pointer-events-none" />
 
@@ -393,38 +487,35 @@ export default function HomePage() {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="mb-16 md:mb-20 text-center"
           >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-200 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-200 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(251,191,36,0.3)]">
                 Featured Projects
               </span>
             </h2>
 
-            <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+            <p className="text-gray-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
               A curated selection of high-performing digital products crafted
               with precision, performance, and premium design standards.
             </p>
 
-            {/* Subtle divider line */}
-            <div className="mt-10 w-24 h-[2px] mx-auto bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-40" />
+            {/* Decorative Line */}
+            <div className="mt-10 flex items-center justify-center gap-3">
+              <div className="w-20 h-[2px] bg-gradient-to-r from-transparent to-amber-400/50" />
+              <div className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.6)]" />
+              <div className="w-20 h-[2px] bg-gradient-to-l from-transparent to-amber-400/50" />
+            </div>
           </motion.div>
 
           {/* Projects Grid */}
           <div className="relative mb-16">
-            {/* Grid Glow Layer */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/[0.02] to-transparent pointer-events-none rounded-3xl" />
-
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {featuredProjects.map((project, index) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={index}
-                />
+                <ProjectCard key={project.id} project={project} index={index} />
               ))}
             </div>
           </div>
 
-          {/* CTA Section */}
+          {/* View All Button */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -432,40 +523,42 @@ export default function HomePage() {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="flex justify-center"
           >
-            <div className="relative">
-              {/* Button Glow */}
-              <div className="absolute inset-0 bg-amber-500/20 blur-2xl rounded-full opacity-40 pointer-events-none" />
+            <Link
+              href="/websites"
+              className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-semibold rounded-xl overflow-hidden border-2 border-amber-400/40 hover:border-amber-400 transition-all duration-300 hover:scale-105"
+            >
+              {/* Glow Effect */}
+              <span className="absolute inset-0 bg-gradient-to-r from-amber-400/20 via-yellow-400/20 to-amber-400/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-              <div className="flex justify-center">
-                <a
-                  href="/websites"
-                  className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-medium rounded-full overflow-hidden"
+              {/* Background */}
+              <span className="absolute inset-0 bg-white/5 backdrop-blur-xl" />
+
+              {/* Shine Effect */}
+              <span className="absolute -left-40 top-0 h-full w-40 bg-white/20 skew-x-12 group-hover:left-[120%] transition-all duration-700" />
+
+              {/* Text */}
+              <span className="relative z-10 text-amber-300 group-hover:text-white transition-colors duration-300 flex items-center gap-2">
+                View All Websites
+                <svg
+                  className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  {/* Glow Layer */}
-                  <span className="absolute inset-0 bg-gradient-to-r from-amber-400/30 via-yellow-400/30 to-amber-400/30 blur-xl opacity-40 group-hover:opacity-70 transition duration-500" />
-
-                  {/* Border */}
-                  <span className="absolute inset-0 rounded-full border border-amber-400/40 group-hover:border-amber-300 transition duration-300" />
-
-                  {/* Background Glass */}
-                  <span className="absolute inset-0 bg-white/5 backdrop-blur-xl rounded-full" />
-
-                  {/* Shine Effect */}
-                  <span className="absolute -left-40 top-0 h-full w-40 bg-white/20 skew-x-12 group-hover:left-[120%] transition-all duration-700" />
-
-                  {/* Text */}
-                  <span className="relative z-10 text-amber-300 group-hover:text-white transition duration-300">
-                    View All Websites →
-                  </span>
-                </a>
-              </div>
-
-            </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </span>
+            </Link>
           </motion.div>
         </div>
       </section>
 
-
+      {/* Categories Section */}
       <section className="relative w-full py-32 px-6 md:px-16 lg:px-24">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/30 to-transparent" />
 
@@ -477,12 +570,12 @@ export default function HomePage() {
             transition={{ duration: 0.8 }}
             className="mb-20 text-center"
           >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 bg-clip-text text-transparent mb-6">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 bg-clip-text text-transparent mb-6 drop-shadow-[0_0_30px_rgba(251,191,36,0.3)]">
               Explore My Work Categories
             </h2>
-            <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto">
+            <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto">
               From web development to creative branding and AI content, explore
-              all my work categories.
+              all my work categories and find what suits your needs.
             </p>
           </motion.div>
 
@@ -494,9 +587,10 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* CTA Section */}
       <section className="relative w-full py-24 md:py-32 px-6 md:px-16 lg:px-24 overflow-hidden">
-        {/* Background Ambient Glow */}
-        <div className="absolute inset-0 bg-black" />
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-black/20" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/10 blur-[160px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-yellow-400/10 blur-[140px] rounded-full pointer-events-none" />
 
@@ -507,27 +601,27 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="relative rounded-3xl border border-amber-400/20 
-                 bg-gradient-to-b from-white/5 to-white/[0.02] 
+                 bg-gradient-to-b from-white/[0.07] to-white/[0.02] 
                  backdrop-blur-2xl 
                  p-10 md:p-14 lg:p-16
-                 shadow-[0_0_60px_rgba(251,191,36,0.08)]
+                 shadow-[0_0_60px_rgba(251,191,36,0.1)]
                  text-center"
           >
-            {/* Inner subtle border glow */}
+            {/* Inner Glow */}
             <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/10 pointer-events-none" />
 
             {/* Content */}
             <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-tight mb-6">
-                <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-200 bg-clip-text text-transparent">
-                  Let’s Build Something Powerful
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight mb-6">
+                <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-200 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(251,191,36,0.3)]">
+                  Let's Build Something Powerful
                 </span>
               </h2>
 
-              <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-10">
-                Whether you need a modern website, premium branding assets,
-                or AI-driven marketing content — We craft high-performance
-                digital experiences that actually convert.
+              <p className="text-gray-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-10">
+                Whether you need a modern website, premium branding assets, or
+                AI-driven marketing content — We craft high-performance digital
+                experiences that actually convert and drive results.
               </p>
 
               <div className="flex justify-center">
@@ -543,7 +637,6 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
-
 
       <style jsx global>{`
         @keyframes gradient {
